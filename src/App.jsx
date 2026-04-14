@@ -7,7 +7,7 @@ export default function App() {
     <Container maxWidth="sm">
       <Box sx={{ mt: 5 }}>
         <Typography variant="h4" gutterBottom>
-          Booking Demo
+          Demo de Reservas
         </Typography>
         <ResponsiveDatePicker />
       </Box>
