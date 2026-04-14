@@ -35,13 +35,23 @@ export default function ResponsiveDatePicker() {
         slots={{
           day: (props) => {
             const booked = isBooked(props.day)
+            const past = dayjs(props.day).isBefore(dayjs(), 'day')
             const selected = value ? isSameDay(props.day, value) : false
 
             return (
               <PickersDay
                 {...props}
                 sx={{
-                  ...(booked
+                  ...(past
+                    ? {
+                        backgroundColor: 'rgba(21, 101, 192, 0.16)',
+                        color: '#0d47a1',
+                        '&.Mui-disabled': {
+                          color: '#0d47a1',
+                          opacity: 1,
+                        },
+                      }
+                    : booked
                     ? {
                         backgroundColor: 'rgba(211, 47, 47, 0.16)',
                         color: '#b71c1c',
@@ -56,10 +66,10 @@ export default function ResponsiveDatePicker() {
                       }),
                   ...(selected
                     ? {
-                        backgroundColor: booked ? '#d32f2f' : '#2e7d32',
+                        backgroundColor: past ? '#1565c0' : booked ? '#d32f2f' : '#2e7d32',
                         color: '#fff',
                         '&:hover, &:focus': {
-                          backgroundColor: booked ? '#b71c1c' : '#1b5e20',
+                          backgroundColor: past ? '#0d47a1' : booked ? '#b71c1c' : '#1b5e20',
                         },
                       }
                     : {}),
