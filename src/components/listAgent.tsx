@@ -59,8 +59,8 @@ export default function ListAgent() {
                 </Stack>
 
                 <Box sx={{ display: 'grid', gap: 1.1 }}>
-                  <InfoRow label="Codigo" value={agent.code} />
-                  <InfoRow label="Telefono" value={agent.phone} />
+                  <InfoRow label="Código" value={agent.code} />
+                  <InfoRow label="Teléfono" value={agent.phone} />
                   <InfoRow label="Dirección" value={agent.address} />
                   <InfoRow label="Tipo Cliente" value={agent.clientType} />
                   <InfoRow label="Fecha Registro" value={agent.dateTime} />

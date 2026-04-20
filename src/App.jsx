@@ -44,7 +44,7 @@ export default function App() {
                   sx={{ borderRadius: "20px", py: 2 }}
                   onClick={() => setLocation('/app/agendar/mayas')}
                 >
-                  Mayas
+                  Mallas
                 </Button>
 
                 <Button

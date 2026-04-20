@@ -5,7 +5,7 @@
     "phone": "+51 987 654 321",
     "address": "Av. Javier Prado 1200, Lima",
     "status": "Culminado",
-    "clientType": "Mayas",
+    "clientType": "Mallas",
     "dateTime":"19/04/2026 08:01 AM",
     "dateAgent":"27/04/2026"
   },
@@ -35,7 +35,7 @@
     "phone": "+51 933 441 220",
     "address": "Av. Primavera 301, San Borja",
     "status": "Cancelado",
-    "clientType": "Mayas",
+    "clientType": "Mallas",
     "dateTime":"19/04/2026 08:01 AM",
     "dateAgent":"27/04/2026"
   },
@@ -45,7 +45,7 @@
     "phone": "+51 922 763 554",
     "address": "Calle Bellavista 777, Barranco",
     "status": "Confirmado",
-    "clientType": "Mayas",
+    "clientType": "Mallas",
     "dateTime":"19/04/2026 08:01 AM",
     "dateAgent":"27/04/2026"
   }
