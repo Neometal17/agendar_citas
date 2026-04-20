@@ -1,0 +1,42 @@
+[
+  {
+    "code": "AGT-001",
+    "name": "Maria Torres",
+    "phone": "+51 987 654 321",
+    "address": "Av. Javier Prado 1200, Lima",
+    "status": "Active",
+    "clientType": "Premium"
+  },
+  {
+    "code": "AGT-002",
+    "name": "Carlos Rojas",
+    "phone": "+51 964 112 009",
+    "address": "Calle Los Cedros 450, Miraflores",
+    "status": "Inactive",
+    "clientType": "Standard"
+  },
+  {
+    "code": "AGT-003",
+    "name": "Lucia Mendoza",
+    "phone": "+51 955 200 711",
+    "address": "Jr. San Martin 98, Surco",
+    "status": "Active",
+    "clientType": "Enterprise"
+  },
+  {
+    "code": "AGT-004",
+    "name": "Jose Salazar",
+    "phone": "+51 933 441 220",
+    "address": "Av. Primavera 301, San Borja",
+    "status": "Pending",
+    "clientType": "Standard"
+  },
+  {
+    "code": "AGT-005",
+    "name": "Daniela Paredes",
+    "phone": "+51 922 763 554",
+    "address": "Calle Bellavista 777, Barranco",
+    "status": "Active",
+    "clientType": "Premium"
+  }
+]

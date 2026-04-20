@@ -1,9 +1,12 @@
-import React from 'react'
 import { Container, Typography, Box, Button } from '@mui/material'
 import ResponsiveDatePicker from './components/ResponsiveDatePicker.jsx'
-import { Router, Route, Switch } from 'wouter'
+import FormAgent from './components/FormAgent.jsx'
+import ListAgent from './components/listAgent.tsx'
+import { Router, Route, Switch, useLocation } from 'wouter'
 
 export default function App() {
+  const [, setLocation] = useLocation()
+
   return (
     <Router>
       <Switch>
@@ -39,6 +42,7 @@ export default function App() {
                   variant="contained"
                   fullWidth
                   sx={{ borderRadius: "20px", py: 2 }}
+                  onClick={() => setLocation('/app/agendar/mayas')}
                 >
                   Mayas
                 </Button>
@@ -50,9 +54,26 @@ export default function App() {
                 >
                   Limpieza de muebles
                 </Button>
+
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  sx={{ borderRadius: "20px", py: 2 }}
+                  onClick={() => setLocation('/app/agentes')}
+                >
+                  Lista de agentes
+                </Button>
               </Box>
             </Container>
           </Box>
+        </Route>
+
+        <Route path="/app/agentes">
+          <ListAgent />
+        </Route>
+
+        <Route path="/app/agendar/:typeAgent">
+                {(params) => <FormAgent />}
         </Route>
 
         <Route>
