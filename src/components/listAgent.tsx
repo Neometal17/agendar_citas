@@ -8,12 +8,16 @@ type Agent = {
   address: string
   status: string
   clientType: string
+  dateTime: string
+  dateAgent: string
 }
 
-const statusColor: Record<string, 'success' | 'default' | 'warning' | 'error'> = {
-  active: 'success',
-  inactive: 'default',
-  pending: 'warning',
+const statusColor: Record<string, 'success' | 'secondary' | 'primary' | 'default' | 'warning' | 'error' | 'info' > = {
+  pendiente: 'warning',
+  confirmado: 'primary',
+  cancelado: 'error',
+  reagendado: 'secondary',
+  culminado: 'success',
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -55,10 +59,12 @@ export default function ListAgent() {
                 </Stack>
 
                 <Box sx={{ display: 'grid', gap: 1.1 }}>
-                  <InfoRow label="Code" value={agent.code} />
-                  <InfoRow label="Phone" value={agent.phone} />
-                  <InfoRow label="Address" value={agent.address} />
-                  <InfoRow label="Client Type" value={agent.clientType} />
+                  <InfoRow label="Codigo" value={agent.code} />
+                  <InfoRow label="Telefono" value={agent.phone} />
+                  <InfoRow label="Dirección" value={agent.address} />
+                  <InfoRow label="Tipo Cliente" value={agent.clientType} />
+                  <InfoRow label="Fecha Registro" value={agent.dateTime} />
+                  <InfoRow label="Fecha Agenda" value={agent.dateAgent} />
                 </Box>
               </CardContent>
             </Card>

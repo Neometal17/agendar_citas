@@ -4,39 +4,49 @@
     "name": "Maria Torres",
     "phone": "+51 987 654 321",
     "address": "Av. Javier Prado 1200, Lima",
-    "status": "Active",
-    "clientType": "Premium"
+    "status": "Culminado",
+    "clientType": "Mayas",
+    "dateTime":"19/04/2026 08:01 AM",
+    "dateAgent":"27/04/2026"
   },
   {
     "code": "AGT-002",
     "name": "Carlos Rojas",
     "phone": "+51 964 112 009",
     "address": "Calle Los Cedros 450, Miraflores",
-    "status": "Inactive",
-    "clientType": "Standard"
+    "status": "Pendiente",
+    "clientType": "Limpieza Muebles",
+    "dateTime":"19/04/2026 08:01 AM",
+    "dateAgent":"27/04/2026"
   },
   {
     "code": "AGT-003",
     "name": "Lucia Mendoza",
     "phone": "+51 955 200 711",
     "address": "Jr. San Martin 98, Surco",
-    "status": "Active",
-    "clientType": "Enterprise"
+    "status": "Reagendado",
+    "clientType": "Limpieza Muebles",
+    "dateTime":"19/04/2026 08:01 AM",
+    "dateAgent":"27/04/2026"
   },
   {
     "code": "AGT-004",
     "name": "Jose Salazar",
     "phone": "+51 933 441 220",
     "address": "Av. Primavera 301, San Borja",
-    "status": "Pending",
-    "clientType": "Standard"
+    "status": "Cancelado",
+    "clientType": "Mayas",
+    "dateTime":"19/04/2026 08:01 AM",
+    "dateAgent":"27/04/2026"
   },
   {
     "code": "AGT-005",
     "name": "Daniela Paredes",
     "phone": "+51 922 763 554",
     "address": "Calle Bellavista 777, Barranco",
-    "status": "Active",
-    "clientType": "Premium"
+    "status": "Confirmado",
+    "clientType": "Mayas",
+    "dateTime":"19/04/2026 08:01 AM",
+    "dateAgent":"27/04/2026"
   }
 ]
