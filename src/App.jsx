@@ -51,6 +51,7 @@ export default function App() {
                   variant="contained"
                   fullWidth
                   sx={{ borderRadius: "20px", py: 2 }}
+                  onClick={() => setLocation('/app/agendar/limpiar')}
                 >
                   Limpieza de muebles
                 </Button>

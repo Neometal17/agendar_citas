@@ -14,10 +14,10 @@ export default function FormAgent() {
   const { typeAgent } = useParams()
 
   const [form, setForm] = useState({
-    nombre: '',
-    telefono: '',
-    direccion: '',
-    fecha: null
+    name: '',
+    phone: '',
+    direction: '',
+    dateAgend: null
   })
 
   const handleChange = (field) => (event) => {
@@ -29,13 +29,34 @@ export default function FormAgent() {
 
   // 👇 Esto depende de cómo implementaste tu DatePicker
   const handleDateChange = (newDate) => {
+    // console.log("Cambio Fecha")
     setForm({
       ...form,
-      fecha: newDate
+      dateAgend: newDate ? newDate.format('YYYY-MM-DD') : null
     })
   }
 
   const handleSubmit = async () => {
+    if (!form.name.trim()) {
+      alert('Nombre requerido')
+      return
+    }
+
+    if (!form.direction.trim()) {
+      alert('Dirección requerida')
+      return
+    }
+
+    if (!form.phone.trim()) {
+      alert('Teléfono requerido')
+      return
+    }
+
+    if (!form.dateAgend) {
+      alert('Fecha requerida')
+      return
+    }
+
     const payload = {
       ...form,
       tipoAgente: typeAgent
@@ -44,7 +65,7 @@ export default function FormAgent() {
     console.log('Enviando:', payload)
 
     try {
-      const response = await fetch('http://localhost:8080/api/agendar', {
+      const response = await fetch('http://localhost:3000/api/agend/save', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -59,7 +80,7 @@ export default function FormAgent() {
       const data = await response.json()
       console.log('Respuesta:', data)
 
-      alert('Formulario enviado correctamente')
+      alert('La Agenda fue realizada')
     } catch (error) {
       console.error(error)
       alert('Error al enviar el formulario')
@@ -79,7 +100,7 @@ export default function FormAgent() {
       >
         {/* Título */}
         <Typography variant="h5" textAlign="center" fontWeight="bold">
-          Formulario - {typeAgent}
+          Formulario - {typeAgent == 'limpiar' ? 'Limpieza de Muebles' : typeAgent}
         </Typography>
 
         {/* Inputs */}
@@ -87,16 +108,16 @@ export default function FormAgent() {
           <TextField
             label="Nombre"
             fullWidth
-            value={form.nombre}
-            onChange={handleChange('nombre')}
+            value={form.name}
+            onChange={handleChange('name')}
           />
 
           <TextField
             label="Número telefónico"
             fullWidth
             type="tel"
-            value={form.telefono}
-            onChange={handleChange('telefono')}
+            value={form.phone}
+            onChange={handleChange('phone')}
           />
 
           <TextField
@@ -104,8 +125,8 @@ export default function FormAgent() {
             fullWidth
             multiline
             rows={3}
-            value={form.direccion}
-            onChange={handleChange('direccion')}
+            value={form.direction}
+            onChange={handleChange('direction')}
           />
         </Stack>
 

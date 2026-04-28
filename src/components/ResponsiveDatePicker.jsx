@@ -13,11 +13,18 @@ const bookedDates = ['2026-04-20', '2026-04-22']
 
 const isSameDay = (dateA, dateB) => dayjs(dateA).isSame(dayjs(dateB), 'day')
 
-export default function ResponsiveDatePicker() {
+export default function ResponsiveDatePicker({onChange}) {
   const [value, setValue] = useState(null)
 
   const isBooked = (date) => {
     return bookedDates.includes(dayjs(date).format('YYYY-MM-DD'))
+  }
+
+  const handleInternalChange = (newValue) => {
+    setValue(newValue)
+    if(onChange){
+      onChange(newValue)
+    }
   }
 
   return (
@@ -29,7 +36,7 @@ export default function ResponsiveDatePicker() {
       <DatePicker
         label="Selecciona fecha"
         value={value}
-        onChange={(newValue) => setValue(newValue)}
+        onChange={handleInternalChange}
         shouldDisableDate={isBooked}
         disablePast
         slots={{
