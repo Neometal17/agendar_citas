@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -16,16 +16,16 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import agents from '../data/agents.json'
+// import agents from '../data/agents.json'
 
 type Agent = {
   code: string
   name: string
   phone: string
-  address: string
+  direction: string
   status: string
-  clientType: string
-  dateTime: string
+  typeClient: string
+  dateRegister: string
   dateAgent: string
   detail?: string
 }
@@ -38,6 +38,38 @@ const statusColor: Record<string, 'success' | 'secondary' | 'primary' | 'default
   cancelado: 'error',
   reagendado: 'secondary',
   culminado: 'success',
+}
+
+const formatDate = (
+  isoDate: string,
+  timeZone: string = 'America/Lima'
+) => {
+  const date = new Date(isoDate)
+
+  const formatter = new Intl.DateTimeFormat('es-PE', {
+    timeZone,
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  })
+
+  // Esto devuelve algo como: "28/04/2026, 06:50 p. m."
+  const parts = formatter.formatToParts(date)
+
+  const get = (type: string) =>
+    parts.find(p => p.type === type)?.value || ''
+
+  const day = get('day')
+  const month = get('month')
+  const year = get('year')
+  const hour = get('hour')
+  const minute = get('minute')
+  const dayPeriod = get('dayPeriod').toUpperCase().replace('.', '')
+
+  return `${day}/${month}/${year} ${hour}:${minute} ${dayPeriod}`
 }
 
 const statusOptions: Status[] = ['Pendiente', 'Confirmado', 'Cancelado', 'Reagendado', 'Culminado']
@@ -56,12 +88,36 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function ListAgent() {
-  const [items, setItems] = useState<Agent[]>(agents as Agent[])
+  // const [items, setItems] = useState<Agent[]>(agents as Agent[])
+  const [items, setItems] = useState<Agent[]>([])
   const [activeFilter, setActiveFilter] = useState<'Todos' | Status>('Todos')
   const [selectedCode, setSelectedCode] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [draftStatus, setDraftStatus] = useState<Status>('Pendiente')
   const [draftDetails, setDraftDetails] = useState('')
+  const [draftDateAgent, setDraftDateAgent] = useState('')
+
+  // Obtener la lista de Agentes
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/agend/admin/list', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        const data: Agent[] = await response.json()
+        setItems(data)
+      } catch (err: any) {
+        console.log(`ListAgente - ${err}`)
+      } finally {
+        console.log('En Espera')
+      }  
+    } 
+    fetchAgents()
+  }, [])
 
   const filteredItems = useMemo(() => {
     if (activeFilter === 'Todos') {
@@ -74,6 +130,7 @@ export default function ListAgent() {
     setSelectedCode(agent.code)
     setDraftStatus(agent.status as Status)
     setDraftDetails(agent.detail ?? '')
+    setDraftDateAgent(agent.dateAgent)
     setDialogOpen(true)
   }
 
@@ -82,21 +139,40 @@ export default function ListAgent() {
     setSelectedCode(null)
   }
 
-  const saveAgentChanges = () => {
+  const saveAgentChanges = async () => {
     if (!selectedCode) {
       return
     }
-    setItems((prev) =>
-      prev.map((agent) =>
-        agent.code === selectedCode
-          ? {
-              ...agent,
-              status: draftStatus,
-              detail: draftDetails.trim(),
-            }
-          : agent,
-      ),
-    )
+    try {
+      const response = await fetch('http://localhost:3000/api/agend/admin/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code: selectedCode,
+          status: draftStatus,
+          detail: draftDetails.trim(),
+          dateAgent: draftDateAgent
+        })
+      })
+      if (response.ok) {
+        setItems((prev) =>
+          prev.map((agent) =>
+            agent.code === selectedCode
+              ? {
+                  ...agent,
+                  status: draftStatus,
+                  detail: draftDetails.trim(),
+                  dateAgent: draftDateAgent,
+                }
+              : agent,
+          ),
+        )
+      }
+    } catch (err: any) {
+      console.log(`Error updating agent - ${err}`)
+    }
     closeEditDialog()
   }
 
@@ -146,9 +222,9 @@ export default function ListAgent() {
                 <Box sx={{ display: 'grid', gap: 1.1 }}>
                   <InfoRow label="Código" value={agent.code} />
                   <InfoRow label="Teléfono" value={agent.phone} />
-                  <InfoRow label="Dirección" value={agent.address} />
-                  <InfoRow label="Tipo Cliente" value={agent.clientType} />
-                  <InfoRow label="Fecha Registro" value={agent.dateTime} />
+                  <InfoRow label="Dirección" value={agent.direction} />
+                  <InfoRow label="Tipo Cliente" value={agent.typeClient} />
+                  <InfoRow label="Fecha Registro" value={formatDate(agent.dateRegister)} />
                   <InfoRow label="Fecha Agenda" value={agent.dateAgent} />
                   {agent.detail ? <InfoRow label="Detalles" value={agent.detail} /> : null}
                 </Box>
@@ -174,6 +250,14 @@ export default function ListAgent() {
               </MenuItem>
             ))}
           </TextField>
+          <TextField
+            label="Fecha Agenda"
+            type="date"
+            value={draftDateAgent}
+            onChange={(event) => setDraftDateAgent(event.target.value)}
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+          />
           <TextField
             label="Detalles"
             value={draftDetails}
