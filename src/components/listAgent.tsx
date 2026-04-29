@@ -16,9 +16,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import ResponsiveDatePicker from './ResponsiveDatePicker'
 // import agents from '../data/agents.json'
 
 type Agent = {
+  _id: string
   code: string
   name: string
   phone: string
@@ -97,25 +99,22 @@ export default function ListAgent() {
   const [draftDetails, setDraftDetails] = useState('')
   const [draftDateAgent, setDraftDateAgent] = useState('')
 
-  // Obtener la lista de Agentes
-  useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/agend/admin/list', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+  const fetchAgents = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/agend/admin/list', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      const data: Agent[] = await response.json()
+      setItems(data)
+    } catch (err: any) {
+      console.log(`ListAgente - ${err}`)
+    }
+  }
 
-        const data: Agent[] = await response.json()
-        setItems(data)
-      } catch (err: any) {
-        console.log(`ListAgente - ${err}`)
-      } finally {
-        console.log('En Espera')
-      }  
-    } 
+  useEffect(() => {
     fetchAgents()
   }, [])
 
@@ -127,9 +126,9 @@ export default function ListAgent() {
   }, [items, activeFilter])
 
   const openEditDialog = (agent: Agent) => {
-    setSelectedCode(agent.code)
+    setSelectedCode(agent._id)
     setDraftStatus(agent.status as Status)
-    setDraftDetails(agent.detail ?? '')
+    setDraftDetails(agent.direction ?? '')
     setDraftDateAgent(agent.dateAgent)
     setDialogOpen(true)
   }
@@ -139,41 +138,39 @@ export default function ListAgent() {
     setSelectedCode(null)
   }
 
+  const handleDateChange = (newValue) => {
+    setDraftDateAgent(newValue ? newValue.format('YYYY-MM-DD') : '')
+  }
+
   const saveAgentChanges = async () => {
     if (!selectedCode) {
       return
     }
     try {
-      const response = await fetch('http://localhost:3000/api/agend/admin/update', {
-        method: 'PUT',
+      const response = await fetch(`http://localhost:3000/api/agend/admin?code=${selectedCode}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          code: selectedCode,
           status: draftStatus,
-          detail: draftDetails.trim(),
+          direction: draftDetails.trim(),
           dateAgent: draftDateAgent
         })
       })
       if (response.ok) {
+        const updatedAgent = await response.json()
         setItems((prev) =>
           prev.map((agent) =>
-            agent.code === selectedCode
-              ? {
-                  ...agent,
-                  status: draftStatus,
-                  detail: draftDetails.trim(),
-                  dateAgent: draftDateAgent,
-                }
-              : agent,
-          ),
+            agent.code === selectedCode ? updatedAgent : agent
+          )
         )
+        closeEditDialog()
+        fetchAgents()
       }
     } catch (err: any) {
       console.log(`Error updating agent - ${err}`)
     }
-    closeEditDialog()
   }
 
   return (
@@ -250,14 +247,7 @@ export default function ListAgent() {
               </MenuItem>
             ))}
           </TextField>
-          <TextField
-            label="Fecha Agenda"
-            type="date"
-            value={draftDateAgent}
-            onChange={(event) => setDraftDateAgent(event.target.value)}
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-          />
+          <ResponsiveDatePicker onChange={handleDateChange} initialValue={draftDateAgent} />
           <TextField
             label="Detalles"
             value={draftDetails}
