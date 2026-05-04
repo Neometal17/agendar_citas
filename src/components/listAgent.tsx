@@ -101,7 +101,7 @@ export default function ListAgent() {
 
   const fetchAgents = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/agend/admin/list', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/agend/admin/list`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -147,7 +147,7 @@ export default function ListAgent() {
       return
     }
     try {
-      const response = await fetch(`http://localhost:3000/api/agend/admin?code=${selectedCode}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/agend/admin?code=${selectedCode}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
