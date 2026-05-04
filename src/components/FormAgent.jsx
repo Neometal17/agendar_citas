@@ -10,6 +10,8 @@ import {
 import { useParams } from 'wouter'
 import ResponsiveDatePicker from '../components/ResponsiveDatePicker'
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
+
 export default function FormAgent() {
   const { typeAgent } = useParams()
 
@@ -65,7 +67,7 @@ export default function FormAgent() {
     console.log('Enviando:', payload)
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/agend/save`, {
+      const response = await fetch(`${API_BASE_URL}/api/agend/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

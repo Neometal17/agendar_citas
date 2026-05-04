@@ -75,6 +75,7 @@ const formatDate = (
 }
 
 const statusOptions: Status[] = ['Pendiente', 'Confirmado', 'Cancelado', 'Reagendado', 'Culminado']
+const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -101,7 +102,7 @@ export default function ListAgent() {
 
   const fetchAgents = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/agend/admin/list`, {
+      const response = await fetch(`${API_BASE_URL}/api/agend/admin/list`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -147,7 +148,7 @@ export default function ListAgent() {
       return
     }
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/agend/admin?code=${selectedCode}`, {
+      const response = await fetch(`${API_BASE_URL}/api/agend/admin?code=${selectedCode}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
