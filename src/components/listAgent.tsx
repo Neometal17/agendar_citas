@@ -33,6 +33,10 @@ type Agent = {
 }
 
 type Status = 'Pendiente' | 'Confirmado' | 'Cancelado' | 'Reagendado' | 'Culminado'
+type AvailabilityDay = {
+  date: string
+  capacity: number
+}
 
 const statusColor: Record<string, 'success' | 'secondary' | 'primary' | 'default' | 'warning' | 'error' | 'info' > = {
   pendiente: 'warning',
@@ -99,6 +103,18 @@ export default function ListAgent() {
   const [draftStatus, setDraftStatus] = useState<Status>('Pendiente')
   const [draftDetails, setDraftDetails] = useState('')
   const [draftDateAgent, setDraftDateAgent] = useState('')
+  const [availabilityDays, setAvailabilityDays] = useState<AvailabilityDay[]>([])
+  const [savingAvailability, setSavingAvailability] = useState(false)
+
+  const startDate = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const endDate = useMemo(() => {
+    const value = new Date()
+    /**
+     * EG: Ajuste del numero de dias a futuro disponible
+     */
+    value.setDate(value.getDate() + 30)
+    return value.toISOString().slice(0, 10)
+  }, [])
 
   const fetchAgents = async () => {
     try {
@@ -117,7 +133,53 @@ export default function ListAgent() {
 
   useEffect(() => {
     fetchAgents()
+    fetchAvailability()
   }, [])
+
+  const fetchAvailability = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/agend/admin/availability?start=${startDate}&end=${endDate}`
+      )
+      if (!response.ok) {
+        return
+      }
+      const data = await response.json()
+      setAvailabilityDays(data.days ?? [])
+    } catch (err: any) {
+      console.log(`Error loading availability - ${err}`)
+    }
+  }
+
+  const handleCapacityChange = (date: string, value: string) => {
+    const parsed = Number(value)
+    const capacity = Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : 0
+    setAvailabilityDays((prev) =>
+      prev.map((day) => (day.date === date ? { ...day, capacity } : day))
+    )
+  }
+
+  const saveAvailability = async () => {
+    try {
+      setSavingAvailability(true)
+      const response = await fetch(`${API_BASE_URL}/api/agend/admin/availability`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          days: availabilityDays
+        })
+      })
+      if (response.ok) {
+        fetchAvailability()
+      }
+    } catch (err: any) {
+      console.log(`Error saving availability - ${err}`)
+    } finally {
+      setSavingAvailability(false)
+    }
+  }
 
   const filteredItems = useMemo(() => {
     if (activeFilter === 'Todos') {
@@ -125,6 +187,13 @@ export default function ListAgent() {
     }
     return items.filter((agent) => agent.status.toLowerCase() === activeFilter.toLowerCase())
   }, [items, activeFilter])
+
+  const availabilityByDate = useMemo(() => {
+    return availabilityDays.reduce((acc, day) => {
+      acc[day.date] = day.capacity
+      return acc
+    }, {} as Record<string, number>)
+  }, [availabilityDays])
 
   const openEditDialog = (agent: Agent) => {
     setSelectedCode(agent._id)
@@ -179,6 +248,40 @@ export default function ListAgent() {
       <Typography variant="h5" fontWeight={700} textAlign={{ xs: 'left', sm: 'center' }} mb={3}>
         Agent List
       </Typography>
+
+      <Card sx={{ borderRadius: 3, mb: 3 }}>
+        <CardContent>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            justifyContent="space-between"
+            gap={2}
+            mb={2}
+          >
+            <Typography variant="h6" fontWeight={700}>
+              Cupos por día (60 días)
+            </Typography>
+            <Button variant="contained" onClick={saveAvailability} disabled={savingAvailability}>
+              {savingAvailability ? 'Guardando...' : 'Guardar cupos'}
+            </Button>
+          </Stack>
+          <Grid container spacing={1.2}>
+            {availabilityDays.map((day) => (
+              <Grid item xs={6} sm={4} md={3} key={day.date}>
+                <TextField
+                  label={day.date}
+                  type="number"
+                  inputProps={{ min: 0 }}
+                  value={day.capacity}
+                  onChange={(event) => handleCapacityChange(day.date, event.target.value)}
+                  fullWidth
+                  size="small"
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </CardContent>
+      </Card>
 
       <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" mb={3}>
         <Chip
@@ -248,7 +351,13 @@ export default function ListAgent() {
               </MenuItem>
             ))}
           </TextField>
-          <ResponsiveDatePicker onChange={handleDateChange} initialValue={draftDateAgent} />
+          <ResponsiveDatePicker
+            onChange={handleDateChange}
+            initialValue={draftDateAgent}
+            availabilityByDate={availabilityByDate}
+            minDate={startDate}
+            maxDate={endDate}
+          />
           <TextField
             label="Detalles"
             value={draftDetails}

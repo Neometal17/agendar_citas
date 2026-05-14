@@ -9,15 +9,23 @@ import 'dayjs/locale/es'
 
 dayjs.locale('es')
 
-const bookedDates = ['2026-04-20', '2026-04-22']
-
 const isSameDay = (dateA, dateB) => dayjs(dateA).isSame(dayjs(dateB), 'day')
 
-export default function ResponsiveDatePicker({onChange, initialValue}) {
+export default function ResponsiveDatePicker({
+  onChange,
+  initialValue,
+  availabilityByDate,
+  minDate,
+  maxDate,
+}) {
   const [value, setValue] = useState(initialValue ? dayjs(initialValue) : null)
 
   const isBooked = (date) => {
-    return bookedDates.includes(dayjs(date).format('YYYY-MM-DD'))
+    if (!availabilityByDate) {
+      return false
+    }
+    const key = dayjs(date).format('YYYY-MM-DD')
+    return (availabilityByDate[key] ?? 0) <= 0
   }
 
   const handleInternalChange = (newValue) => {
@@ -39,6 +47,8 @@ export default function ResponsiveDatePicker({onChange, initialValue}) {
         onChange={handleInternalChange}
         shouldDisableDate={isBooked}
         disablePast
+        minDate={minDate ? dayjs(minDate) : undefined}
+        maxDate={maxDate ? dayjs(maxDate) : undefined}
         slots={{
           day: (props) => {
             const booked = isBooked(props.day)

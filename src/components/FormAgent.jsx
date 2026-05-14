@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Container,
   Typography,
@@ -14,6 +14,7 @@ const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
 
 export default function FormAgent() {
   const { typeAgent } = useParams()
+  const [availabilityByDate, setAvailabilityByDate] = useState({})
 
   const [form, setForm] = useState({
     name: '',
@@ -38,6 +39,38 @@ export default function FormAgent() {
     })
   }
 
+  const startDate = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const endDate = useMemo(() => {
+    const value = new Date()
+    /**
+     * EG: Ajuste del numero de dias a futuro disponible
+     */
+    value.setDate(value.getDate() + 30)
+    return value.toISOString().slice(0, 10)
+  }, [])
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/agend/admin/availability?start=${startDate}&end=${endDate}`
+        )
+        if (!response.ok) {
+          return
+        }
+        const data = await response.json()
+        const map = (data?.days ?? []).reduce((acc, item) => {
+          acc[item.date] = item.capacity
+          return acc
+        }, {})
+        setAvailabilityByDate(map)
+      } catch (error) {
+        console.error('Error loading availability', error)
+      }
+    }
+    fetchAvailability()
+  }, [startDate, endDate])
+
   const handleSubmit = async () => {
     if (!form.name.trim()) {
       alert('Nombre requerido')
@@ -60,8 +93,11 @@ export default function FormAgent() {
     }
 
     const payload = {
-      ...form,
-      tipoAgente: typeAgent
+      name: form.name,
+      phone: form.phone,
+      direction: form.direction,
+      dateAgent: form.dateAgend,
+      typeClient: typeAgent,
     }
 
     console.log('Enviando:', payload)
@@ -134,7 +170,12 @@ export default function FormAgent() {
 
         {/* Date Picker */}
         <Box>
-          <ResponsiveDatePicker onChange={handleDateChange} />
+          <ResponsiveDatePicker
+            onChange={handleDateChange}
+            availabilityByDate={availabilityByDate}
+            minDate={startDate}
+            maxDate={endDate}
+          />
         </Box>
 
         {/* Botón */}
